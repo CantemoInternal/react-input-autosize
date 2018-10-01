@@ -1,4 +1,5 @@
 const React = require('react');
+import PropTypes from 'prop-types';
 
 const sizerStyle = { position: 'absolute', visibility: 'hidden', height: 0, width: 0, overflow: 'scroll', whiteSpace: 'pre' };
 
@@ -11,37 +12,24 @@ const nextFrame = typeof window !== 'undefined' ? (function(){
 		};
 })().bind(window) : undefined; // If window is undefined, then we can't define a nextFrame function
 
-const AutosizeInput = React.createClass({
-	propTypes: {
-		value: React.PropTypes.any,                 // field value
-		defaultValue: React.PropTypes.any,          // default field value
-		onChange: React.PropTypes.func,             // onChange handler: function(newValue) {}
-		style: React.PropTypes.object,              // css styles for the outer element
-		className: React.PropTypes.string,          // className for the outer element
-		minWidth: React.PropTypes.oneOfType([       // minimum width for input element
-			React.PropTypes.number,
-			React.PropTypes.string
-		]),
-		inputStyle: React.PropTypes.object,         // css styles for the input element
-		inputClassName: React.PropTypes.string      // className for the input element
-	},
-	getDefaultProps () {
-		return {
-			minWidth: 1
-		};
-	},
-	getInitialState () {
-		return {
-			inputWidth: this.props.minWidth
-		};
-	},
+class AutosizeInput extends React.Component {
+	constructor(props) {
+	  super(props);
+  
+	  this.state = {
+		inputWidth: this.props.minWidth
+	  };
+	}
+	
 	componentDidMount () {
 		this.copyInputStyles();
 		this.updateInputWidth();
-	},
+	};
+
 	componentDidUpdate () {
 		this.updateInputWidth();
-	},
+	};
+
 	copyInputStyles () {
 		if (!this.isMounted() || !window.getComputedStyle) {
 			return;
@@ -64,7 +52,8 @@ const AutosizeInput = React.createClass({
 			placeholderNode.style.fontStyle = inputStyle.fontStyle;
 			placeholderNode.style.letterSpacing = inputStyle.letterSpacing;
 		}
-	},
+	};
+
 	updateInputWidth () {
 		if (!this.isMounted() || typeof this.refs.sizer.scrollWidth === 'undefined') {
 			return;
@@ -83,19 +72,24 @@ const AutosizeInput = React.createClass({
 				inputWidth: newInputWidth
 			});
 		}
-	},
+	};
+
 	getInput () {
 		return this.refs.input;
-	},
+	};
+
 	focus () {
 		this.refs.input.focus();
-	},
+	};
+
 	blur () {
 		this.refs.input.blur();
-	},
+	};
+
 	select () {
 		this.refs.input.select();
-	},
+	};
+
 	render () {
 		const sizerValue = (this.props.defaultValue || this.props.value || '');
 		const wrapperStyle = this.props.style || {};
@@ -111,7 +105,25 @@ const AutosizeInput = React.createClass({
 				{placeholder}
 			</div>
 		);
-	}
-});
+	};
+};
+
+AutosizeInput.propTypes = {
+	value: PropTypes.any,                 // field value
+	defaultValue: PropTypes.any,          // default field value
+	onChange: PropTypes.func,             // onChange handler: function(newValue) {}
+	style: PropTypes.object,              // css styles for the outer element
+	className: PropTypes.string,          // className for the outer element
+	minWidth: PropTypes.oneOfType([       // minimum width for input element
+		PropTypes.number,
+		PropTypes.string
+	]),
+	inputStyle: PropTypes.object,         // css styles for the input element
+	inputClassName: PropTypes.string      // className for the input element
+};
+
+AutosizeInput.defaultProps = {
+	minWidth: 1
+};
 
 module.exports = AutosizeInput;
